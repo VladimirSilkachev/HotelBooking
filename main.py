@@ -1,5 +1,5 @@
-# Sasha loh
-
+'''Проект HotelBooking,
+    разработчики: Винников С. 35%, Попов К. 34%, Силкачев В. 30%'''
 class Hotel:
     """Этот класс позволяет работать с каждым клиентом, подающим заявку на бронирование"""
 
@@ -7,7 +7,7 @@ class Hotel:
     lost_dohod = 0
 
     def __init__(self, date_booking, last_name, first_name, middle_name, number_ppl,  date_in, number_of_days, max_sum):
-        """Метод, создающий экземпялр класса"""
+        """Метод, создающий экземпляр класса"""
         self.date_booking = date_booking
         self.last_name = last_name
         self.first_name = first_name
@@ -18,10 +18,11 @@ class Hotel:
         self.max_sum = max_sum
 
     def value(self):
+        '''Метод, позволяющий доход отеля, а так же работает с каждой поступающей заявкой.'''
         with open("booking.txt", "r", encoding="utf-8") as r:
             txt = r.readlines()
 
-        with open('fond.txt', 'r', encoding='utf-8') as f:
+        with open('fund.txt', 'r', encoding='utf-8') as f:
             lst = f.readlines()
 
         lst_1 = []
@@ -82,6 +83,19 @@ class Hotel:
             prib = max(spisok)
             c = spisok.index(prib)
             number = lst_2[c % r][0]       # номер занимаемой комнаты
+
+            count_days = int(self.date_in.split('.')[0]) + int(self.date_in.split('.')[1]) + int(self.number_of_days)
+            if int(number) == 0:           # Проверка, не занят ли выбранный программой номер.
+                if d[int(number)] == 0:
+                    d[int(number)] = count_days
+                    pass
+                else:
+                    if count_days >= d[int(number)]:
+                        d[int(number)] = 0
+                    else:
+                        d[int(number)] = 1
+                        lst_2.remove(str([s % r][0]))
+
             type_number = lst_2[c % r][3]  # комфортность номера
 
             if c // r == 0:
@@ -97,11 +111,23 @@ class Hotel:
             else:
                 Hotel.lost_dohod += int(self.max_sum) * int(self.number_of_days)
 
-        if prib == 0:
+        if prib == 0 or answer != 'да':
             Hotel.lost_dohod += int(self.max_sum) * int(self.number_of_days)
-            return "Заявка на бронирование отклонена"
+            print("--------------------------------------------------------------------------------------\n"
+                  ""
+                  "Поступила заявка на бронирование:\n"
+                  "", self.first_name, self.middle_name, self.max_sum, self.number_of_days,self.date_in,
+                  '\n' "Заявка на бронирование отклонена\n"
+                  "--------------------------------------------------------------------------------------")
         else:
-            return self.last_name, self.first_name, self.middle_name, prib, self.max_sum
+            print("--------------------------------------------------------------------------------------\n"
+                  ""
+                  "Поступила заявка на бронирование:\n"
+                  "", self.last_name, self.first_name, self.middle_name, self.max_sum, self.number_of_days,self.date_in,
+                  '\n' "Найден: \n"
+                  ""
+                  "номер",number,'стоимость',prib,"\n",
+                  "--------------------------------------------------------------------------------------")
 
 
 
@@ -110,10 +136,7 @@ with open("booking.txt", "r", encoding="utf-8") as r:
 
 for i in txt:  # Создаёт экземпляр класса
     i = i.split()  # Одна строка файла booking.txt = 1 экземпляру
-    print(i)
     c = Hotel(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7])
-    print(c.value())
-    print(Hotel.dohod)
-    print(Hotel.lost_dohod)
-
-    # Саша-конец( (удалить перед отправкой кода)
+    c.value()
+print('Доход отеля: ',Hotel.dohod)
+print('Неполученный доход: ',Hotel.lost_dohod)
